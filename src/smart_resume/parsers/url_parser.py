@@ -5,6 +5,8 @@ from __future__ import annotations
 import httpx
 from bs4 import BeautifulSoup
 
+from smart_resume.utils.sanitize import sanitize_text
+
 
 def parse_url(url: str) -> str:
     """Fetch a URL and extract the main text content.
@@ -28,4 +30,4 @@ def parse_url(url: str) -> str:
 
     # Collapse multiple blank lines
     lines = [line.strip() for line in text.splitlines() if line.strip()]
-    return "\n".join(lines)
+    return sanitize_text("\n".join(lines))

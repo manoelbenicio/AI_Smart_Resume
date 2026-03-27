@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Any
+
+import structlog
 
 from smart_resume.agents.base import BaseAgent
 from smart_resume.models.risk import RiskAssessment
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 SYSTEM_PROMPT = """\
 You are a Risk Assessment Agent identifying positioning risks for executives.
@@ -43,7 +44,11 @@ class RiskAssessmentAgent(BaseAgent):
         raw = self._call_llm(user_prompt, system_prompt=SYSTEM_PROMPT)
         data = self._parse_json(raw)
 
-        result = RiskAssessment.model_validate(data)
+        result = RiskAssessment.safe_parse(data)
         high_risks = [k for k, v in result.risks.items() if v.level in ("High", "Critical")]
-        logger.info("[%s] High/Critical risks: %s", self.agent_name, high_risks or "None")
+        logger.info(
+            "risk_assessment_completed",
+            agent=self.agent_name,
+            high_critical_risks=high_risks or ["None"],
+        )
         return result

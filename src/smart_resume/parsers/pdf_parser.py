@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pdfplumber
 
+from smart_resume.utils.sanitize import sanitize_text
+
 
 def parse_pdf(file_path: str | Path) -> str:
     """Extract all text from a PDF file.
@@ -26,9 +28,9 @@ def parse_pdf(file_path: str | Path) -> str:
                     pages.append(text)
         extracted = "\n\n".join(pages)
         if extracted.strip():
-            return extracted
+            return sanitize_text(extracted)
     except Exception:
         pass
 
     # Fall back for malformed test fixtures or scanned PDFs without extractable text.
-    return path.read_bytes().decode("utf-8", errors="ignore")
+    return sanitize_text(path.read_bytes().decode("utf-8", errors="ignore"))

@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Any
+
+import structlog
 
 from smart_resume.agents.base import BaseAgent
 from smart_resume.models.risk import DistinctivenessResult
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 SYSTEM_PROMPT = """\
 You are a Distinctiveness Agent assessing an executive's unique value.
@@ -45,12 +46,12 @@ class DistinctivenessAgent(BaseAgent):
         raw = self._call_llm(user_prompt, system_prompt=SYSTEM_PROMPT)
         data = self._parse_json(raw)
 
-        result = DistinctivenessResult.model_validate(data)
+        result = DistinctivenessResult.safe_parse(data)
         logger.info(
-            "[%s] Commodity: %s | Differentiators: %d | Weaknesses: %d",
-            self.agent_name,
-            result.is_commodity,
-            len(result.differentiators),
-            len(result.weaknesses),
+            "distinctiveness_completed",
+            agent=self.agent_name,
+            is_commodity=result.is_commodity,
+            differentiator_count=len(result.differentiators),
+            weakness_count=len(result.weaknesses),
         )
         return result

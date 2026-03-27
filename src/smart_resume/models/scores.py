@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from smart_resume.models.base import LLMSafeModel
 
@@ -55,6 +55,19 @@ def _canonical_score_key(raw_key: str) -> str | None:
     return None
 
 
+def _coerce_numeric(value: Any) -> Any:
+    """Coerce numeric-looking strings into int/float values."""
+    if isinstance(value, str):
+        cleaned = value.strip().replace("%", "")
+        if not cleaned:
+            return 0
+        if re.fullmatch(r"-?\d+", cleaned):
+            return int(cleaned)
+        if re.fullmatch(r"-?\d+\.\d+", cleaned):
+            return float(cleaned)
+    return value
+
+
 class CategoryScores(LLMSafeModel):
     """Individual category scores from the Scoring Agent (0–100 each)."""
 
@@ -66,6 +79,21 @@ class CategoryScores(LLMSafeModel):
     career_progression_speed: float = 0
     financial_impact: float = 0
     executive_presence: float = 0
+
+    @field_validator(
+        "scale",
+        "strategic_complexity",
+        "transformation_history",
+        "competitive_differentiation",
+        "international_experience",
+        "career_progression_speed",
+        "financial_impact",
+        "executive_presence",
+        mode="before",
+    )
+    @classmethod
+    def _coerce_score_numbers(cls, value: Any) -> Any:
+        return _coerce_numeric(value)
 
     @model_validator(mode="before")
     @classmethod
@@ -90,6 +118,11 @@ class ScoringResult(LLMSafeModel):
     category_scores: CategoryScores = Field(default_factory=CategoryScores)
     overall_score: float = 0
     explanations: dict[str, str] = Field(default_factory=dict)
+
+    @field_validator("overall_score", mode="before")
+    @classmethod
+    def _coerce_overall_score(cls, value: Any) -> Any:
+        return _coerce_numeric(value)
 
     @model_validator(mode="before")
     @classmethod
@@ -123,3 +156,8 @@ class ReEvaluationResult(LLMSafeModel):
     score: float = 0
     explanation: str = ""
     recommendations: list[str] = Field(default_factory=list)
+
+    @field_validator("score", mode="before")
+    @classmethod
+    def _coerce_score(cls, value: Any) -> Any:
+        return _coerce_numeric(value)

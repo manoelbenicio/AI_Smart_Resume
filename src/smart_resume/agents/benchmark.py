@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Any
+
+import structlog
 
 from smart_resume.agents.base import BaseAgent
 from smart_resume.models.scores import BenchmarkResult
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 SYSTEM_PROMPT = """\
 You are a Benchmark Agent comparing an executive to various archetypes.
@@ -48,6 +49,10 @@ class BenchmarkAgent(BaseAgent):
         raw = self._call_llm(user_prompt, system_prompt=SYSTEM_PROMPT)
         data = self._parse_json(raw)
 
-        result = BenchmarkResult.model_validate(data)
-        logger.info("[%s] Benchmark complete — %d archetypes assessed", self.agent_name, len(result.benchmark))
+        result = BenchmarkResult.safe_parse(data)
+        logger.info(
+            "benchmark_completed",
+            agent=self.agent_name,
+            archetype_count=len(result.benchmark),
+        )
         return result

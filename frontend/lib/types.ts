@@ -11,6 +11,18 @@ export interface AnalyzeRequest {
     strict_mode?: boolean;
 }
 
+export interface AuthRequest {
+    action: "login" | "register";
+    email: string;
+    password: string;
+    full_name?: string;
+}
+
+export interface AuthResponse {
+    access_token: string;
+    token_type: "bearer";
+}
+
 export interface MetricDetail {
     score: number;
     max_score: number;

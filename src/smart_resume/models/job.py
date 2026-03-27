@@ -37,7 +37,7 @@ class JobDescription(LLMSafeModel):
             return [f"{k}: {v}" for k, v in value.items()]
         if isinstance(value, str):
             return [value] if value.strip() else []
-        if isinstance(value, list):
+        if isinstance(value, (list, tuple, set)):
             normalized: list[str] = []
             for item in value:
                 if isinstance(item, dict):

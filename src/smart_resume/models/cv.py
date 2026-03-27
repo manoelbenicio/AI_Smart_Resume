@@ -47,6 +47,28 @@ class Experience(LLMSafeModel):
             return {}
         return v
 
+    @field_validator("achievements", mode="before")
+    @classmethod
+    def _coerce_achievements(cls, value: Any) -> list[str]:
+        """Normalize noisy LLM outputs to list[str]."""
+        if value is None:
+            return []
+        if isinstance(value, str):
+            return [value] if value.strip() else []
+        if isinstance(value, dict):
+            return [f"{k}: {v}" for k, v in value.items()]
+        if isinstance(value, list):
+            normalized: list[str] = []
+            for item in value:
+                if isinstance(item, dict):
+                    normalized.extend(f"{k}: {v}" for k, v in item.items())
+                elif item is not None:
+                    text = str(item).strip()
+                    if text:
+                        normalized.append(text)
+            return normalized
+        return [str(value)]
+
 
 class Education(LLMSafeModel):
     """An educational qualification."""
@@ -75,3 +97,15 @@ class CVData(LLMSafeModel):
     skills: list[str] = Field(default_factory=list)
     languages: list[str] = Field(default_factory=list)
     awards: list[str] = Field(default_factory=list)
+
+    @field_validator("certifications", "skills", "languages", "awards", mode="before")
+    @classmethod
+    def _coerce_to_list(cls, value: Any) -> list[str]:
+        """Wrap scalar strings into lists for LLM tolerance."""
+        if value is None:
+            return []
+        if isinstance(value, str):
+            return [value] if value.strip() else []
+        if isinstance(value, list):
+            return [str(item).strip() for item in value if item is not None and str(item).strip()]
+        return [str(value).strip()] if str(value).strip() else []

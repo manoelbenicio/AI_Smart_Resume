@@ -9,6 +9,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from smart_resume.api.auth import UserContext, get_current_user
@@ -19,6 +20,13 @@ from smart_resume.orchestrator import Orchestrator
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", tags=["pipeline"])
+
+
+@router.get("/health")
+async def health_check(db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+    """Readiness endpoint with database connectivity check."""
+    await db.execute(text("SELECT 1"))
+    return {"status": "ok", "api": "ok", "database": "ok", "version": "0.4.0"}
 
 
 @router.post("/analyze", response_model=AnalyzeResponse)

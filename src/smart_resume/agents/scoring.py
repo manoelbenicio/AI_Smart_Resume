@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Any
+
+import structlog
 
 from smart_resume.agents.base import BaseAgent
 from smart_resume.models.scores import ScoringResult
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 SYSTEM_PROMPT = """\
 You are a Market Positioning Scoring Agent evaluating executives against top performers \
@@ -55,6 +56,10 @@ class ScoringAgent(BaseAgent):
         raw = self._call_llm(user_prompt, system_prompt=SYSTEM_PROMPT)
         data = self._parse_json(raw)
 
-        result = ScoringResult.model_validate(data)
-        logger.info("[%s] Overall score: %.1f", self.agent_name, result.overall_score)
+        result = ScoringResult.safe_parse(data)
+        logger.info(
+            "scoring_completed",
+            agent=self.agent_name,
+            overall_score=result.overall_score,
+        )
         return result

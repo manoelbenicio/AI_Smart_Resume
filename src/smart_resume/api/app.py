@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import logging
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -11,12 +9,7 @@ from smart_resume.api.auth_routes import router as auth_router
 from smart_resume.api.routes import router
 from smart_resume.db.base import Base
 from smart_resume.db.engine import engine
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s │ %(name)-28s │ %(levelname)-7s │ %(message)s",
-    datefmt="%H:%M:%S",
-)
+from smart_resume.logging_config import setup_logging
 
 app = FastAPI(
     title="Executive CV Benchmark Engine",
@@ -45,6 +38,7 @@ app.include_router(auth_router)
 @app.on_event("startup")
 async def init_database() -> None:
     """Create DB tables if they do not exist yet."""
+    setup_logging()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 

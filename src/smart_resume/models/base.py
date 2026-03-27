@@ -7,10 +7,13 @@ None coerced to empty lists, etc.
 
 from __future__ import annotations
 
+import logging
 import typing
-from typing import Any, get_type_hints
+from typing import Any, Self, get_type_hints
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
+
+logger = logging.getLogger(__name__)
 
 
 def _is_list_type(annotation: Any) -> bool:
@@ -68,3 +71,16 @@ class LLMSafeModel(BaseModel):
                 values[field_name] = ""
 
         return values
+
+    @classmethod
+    def safe_parse(cls, data: Any) -> Self:
+        """Validate untrusted model input and fall back to default model on failure."""
+        try:
+            return cls.model_validate(data)
+        except ValidationError as exc:
+            logger.warning(
+                "LLM model validation failed for %s; using defaults. errors=%s",
+                cls.__name__,
+                exc.errors(),
+            )
+            return cls()

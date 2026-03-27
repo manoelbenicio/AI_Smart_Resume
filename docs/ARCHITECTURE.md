@@ -34,6 +34,18 @@
 
 ---
 
+## Port Configuration
+
+Host port bindings are currently remapped to avoid conflicts with other running projects (validated on 2026-03-27):
+
+- Frontend (Next.js): `3000` (unchanged)
+- API (FastAPI): `8001 -> 8000` (`host -> container`)
+- PostgreSQL: `5433 -> 5432` (`host -> container`)
+
+If host ports `8000`/`5432` become free later, mappings can be reverted in `docker-compose.yml`.
+
+---
+
 ## 8-Phase Pipeline Data Flow
 
 ```
@@ -74,6 +86,7 @@ Protected routes     ──► get_current_user(Bearer token) ──► UserCont
 ```
 
 - **Toggle:** `AUTH_ENABLED=false` bypasses JWT validation → returns `anonymous/local@dev`.
+- **Docker default:** `AUTH_ENABLED=true` in `docker-compose.yml` for authenticated API paths.
 - **Tokens:** Signed with `JWT_SECRET_KEY`, expire after `jwt_expire_minutes` (default 1440 = 24h).
 - **Scope:** Every `PipelineRun` is tagged with `user_id` for multi-tenant isolation.
 
@@ -139,7 +152,7 @@ CREATE TABLE pipeline_runs (
 | `POST` | `/api/v1/analyze/upload` | JWT | Analyze CV+JD (file upload) |
 | `GET` | `/api/v1/runs` | JWT | List user's pipeline runs |
 | `GET` | `/api/v1/runs/{id}/download` | JWT | Download generated DOCX |
-| `GET` | `/health` | Public | Service health check |
+| `GET` | `/api/v1/health` | Public | API + DB readiness check |
 
 ---
 

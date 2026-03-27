@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Any
+
+import structlog
 
 from smart_resume.agents.base import BaseAgent
 from smart_resume.models.cv import CVData
 from smart_resume.models.job import JobDescription
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 SYSTEM_PROMPT = """\
 You are a CV and Job Description Extraction Agent.  Given a candidate's CV and a job \
@@ -43,8 +44,12 @@ class ExtractionAgent(BaseAgent):
         raw = self._call_llm(user_prompt, system_prompt=SYSTEM_PROMPT)
         data = self._parse_json(raw)
 
-        cv_data = CVData.model_validate(data.get("cv", {}))
-        jd_data = JobDescription.model_validate(data.get("job_description", {}))
+        cv_data = CVData.safe_parse(data.get("cv", {}))
+        jd_data = JobDescription.safe_parse(data.get("job_description", {}))
 
-        logger.info("[%s] Extracted CV for: %s", self.agent_name, cv_data.personal.name)
+        logger.info(
+            "extraction_completed",
+            agent=self.agent_name,
+            candidate_name=cv_data.personal.name,
+        )
         return cv_data, jd_data

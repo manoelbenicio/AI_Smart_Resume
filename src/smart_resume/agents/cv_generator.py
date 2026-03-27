@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Any
+
+import structlog
 
 from smart_resume.agents.base import BaseAgent
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 SYSTEM_PROMPT = """\
 You are a Premium CV Generator Agent tasked with repositioning a senior executive's résumé.
@@ -86,5 +87,9 @@ class CVGeneratorAgent(BaseAgent):
         user_prompt = "\n\n".join(parts)
         raw = self._call_llm(user_prompt, system_prompt=SYSTEM_PROMPT)
 
-        logger.info("[%s] Generated CV — %d chars", self.agent_name, len(raw))
+        logger.info(
+            "cv_generation_completed",
+            agent=self.agent_name,
+            output_chars=len(raw),
+        )
         return raw

@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Any
+
+import structlog
 
 from smart_resume.agents.base import BaseAgent
 from smart_resume.models.scores import ReEvaluationResult
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 SYSTEM_PROMPT = """\
 You are a Re-Evaluation Agent comparing the updated CV to the job description.
@@ -54,6 +55,11 @@ class ReEvaluationAgent(BaseAgent):
         raw = self._call_llm(user_prompt, system_prompt=SYSTEM_PROMPT)
         data = self._parse_json(raw)
 
-        result = ReEvaluationResult.model_validate(data)
-        logger.info("[%s] Score: %.1f | Recommendations: %d", self.agent_name, result.score, len(result.recommendations))
+        result = ReEvaluationResult.safe_parse(data)
+        logger.info(
+            "reevaluation_completed",
+            agent=self.agent_name,
+            score=result.score,
+            recommendation_count=len(result.recommendations),
+        )
         return result
