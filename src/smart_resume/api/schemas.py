@@ -26,3 +26,41 @@ class AnalyzeResponse(BaseModel):
     improved_cv_markdown: str = ""
     output_docx_path: str | None = None
     output_pdf_path: str | None = None
+
+
+class RegisterRequest(BaseModel):
+    """Auth register request payload."""
+
+    email: str
+    password: str
+    full_name: str | None = None
+
+
+class RegisterResponse(BaseModel):
+    """Auth register response payload."""
+
+    user_id: str
+    email: str
+
+
+class LoginRequest(BaseModel):
+    """Auth login request payload."""
+
+    email: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    """JWT token response payload."""
+
+    access_token: str
+    token_type: str = "bearer"
+
+
+class RunSummaryResponse(BaseModel):
+    """Lightweight pipeline run summary for listing."""
+
+    run_id: str
+    final_score: float
+    iterations_used: int
+    created_at: str | None = None

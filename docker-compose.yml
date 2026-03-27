@@ -1,4 +1,15 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: smart_resume
+      POSTGRES_USER: smartuser
+      POSTGRES_PASSWORD: smartpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   smart-resume-api:
     build:
       context: .
@@ -6,6 +17,8 @@ services:
     image: smart-ai-resume:latest
     env_file:
       - .env
+    depends_on:
+      - postgres
     ports:
       - "8000:8000"
     volumes:
@@ -20,5 +33,9 @@ services:
     volumes:
       - ./outputs:/app/outputs
     depends_on:
+      - postgres
       - smart-resume-api
     command: ["python", "-m", "smart_resume.cli", "--cv", "tests/fixtures/sample_cv.txt", "--jd", "tests/fixtures/sample_jd.txt"]
+
+volumes:
+  pgdata:

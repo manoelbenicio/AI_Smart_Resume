@@ -4,6 +4,65 @@ All notable changes to this project are documented here.
 
 ---
 
+## [0.4.0] — 2026-03-26
+
+### Added — Backend Auth (Self-Hosted JWT)
+- `src/smart_resume/api/auth.py`
+  - Added password hash/verify helpers, JWT creation, and `get_current_user` dependency with `AUTH_ENABLED` bypass mode (`anonymous/local@dev`).
+- `src/smart_resume/api/auth_routes.py`
+  - Added `POST /api/v1/auth/register` and `POST /api/v1/auth/login`.
+- `src/smart_resume/db/engine.py`, `src/smart_resume/db/base.py`, `src/smart_resume/db/models.py`
+  - Added async SQLAlchemy engine/session layer and `users` ORM model.
+- `src/smart_resume/db/migrations/versions/20260326_0001_create_users_table.py`
+  - Added initial users schema migration.
+- `src/smart_resume/config.py`, `.env.example`
+  - Added auth and database environment settings.
+- `tests/unit/test_auth.py`, `tests/unit/test_auth_routes.py`
+  - Added token validation, auth-disabled behavior, password hashing, and register/login endpoint coverage.
+
+### Added — Pipeline Run Persistence (DB-Backed)
+- `src/smart_resume/db/models.py`
+  - Added `PipelineRunRecord` with indexed `user_id` and JSON payload storage.
+- `src/smart_resume/db/repository.py`
+  - Added async CRUD helpers: `save_run`, `get_run`, `list_runs`.
+- `src/smart_resume/api/routes.py`
+  - Removed in-memory `_runs` store.
+  - Persisted analyze/upload results to DB repository.
+  - Wired download and run listing to DB with user scoping.
+- `src/smart_resume/db/migrations/versions/20260326_0002_create_pipeline_runs_table.py`
+  - Added migration for `pipeline_runs` (JSONB on PostgreSQL, JSON fallback for SQLite validation).
+- `tests/unit/test_repository.py`
+  - Added repository persistence/get/list/update tests.
+
+### Changed
+- `pyproject.toml`
+  - Added backend dependencies: `python-jose`, `passlib`, `sqlalchemy[asyncio]`, `asyncpg`, `alembic`.
+  - Added `bcrypt<5` pin for runtime compatibility with `passlib` on Python 3.14.
+  - Added `aiosqlite` in dev dependencies for async repository test coverage.
+- `docker-compose.yml`
+  - Added local `postgres` service for backend auth and run persistence.
+
+### Validation
+- `python -m pytest tests/ -v --tb=short` → **53/53 passed**.
+- `alembic upgrade head` validated against SQLite URL (`DATABASE_URL=sqlite+aiosqlite:///./alembic_validation.db`) to verify migration chain.
+
+## [0.3.0] — 2026-03-26
+
+### Added — Premium Interactive Web UI (Next.js)
+- `frontend/`
+  - Created a completely new modern web application using Next.js 15 App Router, React 19, Tailwind CSS v4, and Shadcn UI.
+  - Implemented dynamic Landing Page (`app/page.tsx`) with drag-and-drop resume upload and ATS integration simulation.
+  - Created a robust `ScoreHero` component utilizing `framer-motion` for fluid counting animations.
+  - Added Data Visualization tools integrating `recharts`:
+    - `MetricsRadar` to map candidate performance across all 8 major evaluation categories.
+    - `BenchmarkBars` to visualize executive placement tier comparisons (Needs Work to Executive).
+  - Developed `RiskHeatmap` to parse and color-code risk probability matrixes directly fetched from the backend.
+  - Enforced structured strict TS types across all elements, directly inherited from the backend LLMSafeModels.
+- **Validation**:
+  - `npm run build` returned exit code 0 under strict ESLint configurations. 
+
+---
+
 ## [0.2.0] — 2026-03-27
 
 ### Fixed — CLI Category Score Display

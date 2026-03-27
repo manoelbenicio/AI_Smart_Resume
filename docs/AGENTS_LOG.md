@@ -104,3 +104,63 @@ Timestamped record of all agent development tasks.
 - **Files Modified:** `src/smart_resume/ui/app.py`, `src/smart_resume/ui/__init__.py`, `pyproject.toml`, `docs/AGENTS_LOG.md`, `docs/DELIVERABLES.md`, `CHANGELOG.md`, `docs/HANDOVER.md`
 - **Tests:** PASSED (41/41)
 - **Status:** COMPLETED
+
+### 041 — Remove Streamlit UI, plan premium Next.js frontend
+- **Agent:** Antigravity
+- **Timestamp:** 2026-03-26T21:46:00-03:00
+- **Phase:** Design
+- **Action:** Removed Streamlit UI (`src/smart_resume/ui/`) and `streamlit` dependency from `pyproject.toml`. User directive: Streamlit is too basic for Fortune 500 caliber. Future UI will be Next.js + Tailwind + Recharts/D3.
+- **Files Modified:** `src/smart_resume/ui/` (DELETED), `pyproject.toml`, `docs/AGENTS_LOG.md`, `docs/DELIVERABLES.md`
+- **Tests:** PASSED (41/41)
+- **Status:** COMPLETED
+
+### 042 — Create FRONTEND_HANDOVER.md for Gemini 3 Pro High
+- **Agent:** Antigravity
+- **Timestamp:** 2026-03-26T22:24:00-03:00
+- **Phase:** Design
+- **Action:** Authored comprehensive frontend handover document (300+ lines) including: full API contract, page structure (4 pages), component breakdown (15+ components), design system (colors, typography, spacing, animations), acceptance criteria (10 gates), and project structure. Targeted at Gemini 3 Pro High for premium Next.js + Tailwind + Recharts/D3 build.
+- **Files Created:** `docs/FRONTEND_HANDOVER.md`
+- **Status:** COMPLETED
+
+| 2026-03-26 22:30 | Agent Onboarding | ✅ Done | Read handover docs, agentic protocol, frontend specs |
+| 2026-03-26 22:45 | Scaffold (Frontend Phase 1) | ✅ Done | Next.js App Router, Tailwind, Shadcn CLI |
+| 2026-03-26 23:00 | Design System (Frontend Phase 2) | ✅ Done | Tailwind configs, theme colors, types |
+| 2026-03-26 23:15 | Core Components (Frontend Phase 3) | ✅ Done | ScoreHero, RadarChart, BenchmarkBars, RiskHeatmap |
+| 2026-03-26 23:30 | Pages & APIs (Frontend Phase 4) | ✅ Done | Landing Page, Dashboard, Loading states |
+| 2026-03-26 23:45 | Verification (Frontend Phase 5) | ✅ Done | ESLint clean, Types strict, Production Build successful |
+
+### 044 — Frontend Implementation
+- **Agent:** Antigravity (Gemini 3 Pro High)
+- **Timestamp:** 2026-03-26T23:45:00-03:00
+- **Phase:** Implementation
+- **Action:** Built the entire interactive Next.js Dashboard. Implemented all required visual components with Tailwind, Framer Motion, and Recharts. Ensured strict type adherence across all endpoints interacting with the backend API. Verified the production build using Turbopack.
+- **Files Modified:** `frontend/*` (Entirely structured), `docs/AGENTS_LOG.md`, `CHANGELOG.md`, `docs/DELIVERABLES.md`
+- **Build Status:** PASSED (Next.js 15)
+- **Status:** COMPLETED
+
+### 045 — Agent Onboarding
+- **Agent:** Codex
+- **Timestamp:** 2026-03-26T23:27:41-03:00
+- **Phase:** Documentation
+- **Action:** Onboarded for backend auth/persistence work. Read protocol, backend handover spec, handover and deliverables docs, and validated baseline suite.
+- **Files Modified:** `docs/AGENTS_LOG.md`
+- **Tests:** PASSED (41/41)
+- **Status:** COMPLETED
+
+### 046 — Implement self-hosted JWT auth with local users table
+- **Agent:** Codex
+- **Timestamp:** 2026-03-26T23:42:29-03:00
+- **Phase:** Implementation
+- **Action:** Implemented local JWT auth with register/login endpoints, async SQLAlchemy DB layer, users migration, and protected pipeline routes with `AUTH_ENABLED` backward-compatible bypass.
+- **Files Modified:** `pyproject.toml`, `.env.example`, `src/smart_resume/config.py`, `src/smart_resume/api/auth.py`, `src/smart_resume/api/auth_routes.py`, `src/smart_resume/api/app.py`, `src/smart_resume/api/schemas.py`, `src/smart_resume/api/routes.py`, `src/smart_resume/db/base.py`, `src/smart_resume/db/engine.py`, `src/smart_resume/db/models.py`, `alembic.ini`, `src/smart_resume/db/migrations/env.py`, `src/smart_resume/db/migrations/script.py.mako`, `src/smart_resume/db/migrations/versions/20260326_0001_create_users_table.py`, `tests/unit/test_auth.py`, `tests/unit/test_auth_routes.py`
+- **Tests:** PASSED (53/53)
+- **Status:** COMPLETED
+
+### 047 — Persist pipeline runs in PostgreSQL repository layer
+- **Agent:** Codex
+- **Timestamp:** 2026-03-26T23:43:10-03:00
+- **Phase:** Implementation
+- **Action:** Replaced in-memory run storage with async DB repository CRUD, added `pipeline_runs` model and migration, wired API run list/download to DB user-scoped queries, and added repository unit coverage.
+- **Files Modified:** `src/smart_resume/db/models.py`, `src/smart_resume/db/repository.py`, `src/smart_resume/api/routes.py`, `src/smart_resume/db/migrations/versions/20260326_0002_create_pipeline_runs_table.py`, `tests/unit/test_repository.py`
+- **Tests:** PASSED (53/53)
+- **Status:** COMPLETED

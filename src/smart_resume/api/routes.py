@@ -6,25 +6,31 @@ import logging
 import tempfile
 from pathlib import Path
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from smart_resume.api.schemas import AnalyzeRequest, AnalyzeResponse
+from smart_resume.api.auth import UserContext, get_current_user
+from smart_resume.api.schemas import AnalyzeRequest, AnalyzeResponse, RunSummaryResponse
+from smart_resume.db.engine import get_db
+from smart_resume.db.repository import get_run, list_runs as list_runs_for_user, save_run
 from smart_resume.orchestrator import Orchestrator
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", tags=["pipeline"])
 
-# In-memory store for completed runs (v1 — replace with DB later)
-_runs: dict[str, object] = {}
-
 
 @router.post("/analyze", response_model=AnalyzeResponse)
-def analyze_text(request: AnalyzeRequest) -> AnalyzeResponse:
+async def analyze_text(
+    request: AnalyzeRequest,
+    user: UserContext = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> AnalyzeResponse:
     """Run the full 8-phase pipeline with text inputs."""
     orchestrator = Orchestrator()
-    state = orchestrator.run(cv_input=request.cv_text, jd_input=request.jd_text)
-    _runs[state.run_id] = state
+    state = await run_in_threadpool(orchestrator.run, request.cv_text, request.jd_text)
+    await save_run(db, user.user_id, state)
     return _build_response(state)
 
 
@@ -32,6 +38,8 @@ def analyze_text(request: AnalyzeRequest) -> AnalyzeResponse:
 async def analyze_upload(
     cv_file: UploadFile = File(..., description="CV file (docx/pdf/txt)"),
     jd_text: str = Form(..., description="Job description text or URL"),
+    user: UserContext = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ) -> AnalyzeResponse:
     """Run the full pipeline with a file upload for the CV."""
     # Save uploaded file temporarily
@@ -43,31 +51,56 @@ async def analyze_upload(
 
     try:
         orchestrator = Orchestrator()
-        state = orchestrator.run(cv_input=tmp_path, jd_input=jd_text)
-        _runs[state.run_id] = state
+        state = await run_in_threadpool(orchestrator.run, tmp_path, jd_text)
+        await save_run(db, user.user_id, state)
         return _build_response(state)
     finally:
         Path(tmp_path).unlink(missing_ok=True)
 
 
 @router.get("/runs/{run_id}/download")
-def download_cv(run_id: str, format: str = "docx") -> FileResponse:
+async def download_cv(
+    run_id: str,
+    format: str = "docx",
+    user: UserContext = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> FileResponse:
     """Download the generated CV as DOCX or PDF."""
-    state = _runs.get(run_id)
-    if not state:
+    run_record = await get_run(db, run_id)
+    if not run_record:
+        raise HTTPException(status_code=404, detail=f"Run {run_id} not found")
+    if run_record.user_id != user.user_id:
         raise HTTPException(status_code=404, detail=f"Run {run_id} not found")
 
-    if format == "pdf" and hasattr(state, "output_pdf_path") and state.output_pdf_path:  # type: ignore[union-attr]
-        return FileResponse(state.output_pdf_path, media_type="application/pdf", filename="cv.pdf")  # type: ignore[union-attr]
+    if format == "pdf" and run_record.output_pdf_path:
+        return FileResponse(run_record.output_pdf_path, media_type="application/pdf", filename="cv.pdf")
 
-    if hasattr(state, "output_docx_path") and state.output_docx_path:  # type: ignore[union-attr]
+    if run_record.output_docx_path:
         return FileResponse(
-            state.output_docx_path,  # type: ignore[union-attr]
+            run_record.output_docx_path,
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             filename="cv.docx",
         )
 
     raise HTTPException(status_code=404, detail="No output file found for this run")
+
+
+@router.get("/runs", response_model=list[RunSummaryResponse])
+async def list_runs(
+    user: UserContext = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[RunSummaryResponse]:
+    """List all run summaries for the current user."""
+    records = await list_runs_for_user(db, user.user_id)
+    return [
+        RunSummaryResponse(
+            run_id=record.id,
+            final_score=record.final_score,
+            iterations_used=record.iterations_used,
+            created_at=record.created_at.isoformat() if record.created_at else None,
+        )
+        for record in records
+    ]
 
 
 def _build_response(state: object) -> AnalyzeResponse:

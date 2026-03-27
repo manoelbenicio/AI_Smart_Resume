@@ -7,6 +7,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from smart_resume.api.auth_routes import router as auth_router
 from smart_resume.api.routes import router
 
 logging.basicConfig(
@@ -36,6 +37,7 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(auth_router)
 
 
 @app.get("/health")

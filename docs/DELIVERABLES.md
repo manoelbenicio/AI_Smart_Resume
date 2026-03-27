@@ -31,7 +31,7 @@ Maps every requirement from `project_scope.md` to implementation status.
 | 25 | Integration tests | Scope §QA | `tests/integration/` (12 tests) | ✅ Done |
 | 26 | README documentation | Scope §Docs | `README.md` | ✅ Done |
 | 27 | Architecture documentation | Scope §Docs | `docs/ARCHITECTURE.md` | ✅ Done |
-| 28 | Streamlit UI | Scope §Stretch | `src/smart_resume/ui/app.py` | ✅ Done |
+| 28 | Premium Web UI (Next.js + Tailwind + Recharts/D3) | Scope §Stretch | `frontend/` | ✅ Done |
 | 29 | LLM output hardening (LLMSafeModel) | Post-testing | `models/base.py`, all model files | ✅ Done |
 | 30 | Verified E2E pipeline run (8 phases, score 85.0) | Post-testing | `outputs/`, audit trail JSON | ✅ Done |
 | 31 | Professional handover document | Project Governance | `docs/HANDOVER.md` | ✅ Done |
@@ -41,4 +41,6 @@ Maps every requirement from `project_scope.md` to implementation status.
 | 35 | Prompt tuning to achieve score >= 90 in <= 3 iterations | Handover §6.3 | `src/smart_resume/agents/cv_generator.py`, `src/smart_resume/agents/re_evaluation.py` | ✅ Done |
 | 36 | Docker containerization and Compose runtime validation | Handover §6.4 | `Dockerfile`, `docker-compose.yml`, `.dockerignore` | ✅ Done |
 | 37 | GitHub Actions CI workflow (pytest + ruff + mypy) | Handover §6.5 | `.github/workflows/ci.yml` | ✅ Done |
-| 38 | Streamlit UI runtime validation at localhost:8501 | Handover §6.6 | `src/smart_resume/ui/app.py`, `pyproject.toml` | ✅ Done |
+| 38 | ~~Streamlit UI~~ REMOVED — replaced by Next.js plan | Handover §6.6 | DELETED | ❌ Superseded |
+| 39 | Self-hosted JWT auth with local users table and protected API routes | Backend Handover Task 1 | `src/smart_resume/api/auth.py`, `src/smart_resume/api/auth_routes.py`, `src/smart_resume/db/models.py`, `src/smart_resume/db/engine.py`, `src/smart_resume/db/migrations/versions/20260326_0001_create_users_table.py`, `tests/unit/test_auth.py`, `tests/unit/test_auth_routes.py` | ✅ Done |
+| 40 | Pipeline run DB persistence (replace in-memory runs) | Backend Handover Task 2 | `src/smart_resume/db/repository.py`, `src/smart_resume/api/routes.py`, `src/smart_resume/db/migrations/versions/20260326_0002_create_pipeline_runs_table.py`, `tests/unit/test_repository.py` | ✅ Done |

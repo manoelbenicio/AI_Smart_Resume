@@ -12,8 +12,8 @@
 Multi-agent AI system that benchmarks executive CVs against job descriptions through an **8-phase pipeline**: Extraction → Scoring → Benchmark → Distinctiveness → Risk Assessment → CV Generation → Re-Evaluation → Export.
 
 **LLM Provider:** OpenAI GPT-4o (via `openai` SDK)
-**Current Version:** v0.2.0
-**Status:** Core pipeline operational — passing E2E with score 85.0/100
+**Current Version:** v0.4.0
+**Status:** Core pipeline + backend auth + DB persistence operational
 
 ---
 
@@ -69,7 +69,7 @@ src/smart_resume/
 ## 4. Current Test Results
 
 ```
-41 passed in 0.25s
+53 passed in 4.01s
 ```
 
 | Suite | Count | Coverage |
@@ -79,6 +79,9 @@ src/smart_resume/
 | `tests/unit/test_parsers.py` | 2 | TXT parser |
 | `tests/unit/test_config.py` | 3 | Settings defaults/env |
 | `tests/integration/test_pipeline.py` | 12 | Pipeline models + audit trail |
+| `tests/unit/test_auth.py` | 5 | JWT auth helpers + auth toggle behavior |
+| `tests/unit/test_auth_routes.py` | 3 | Register/login route coverage |
+| `tests/unit/test_repository.py` | 4 | Async DB run persistence repository |
 
 **Run tests:** `python -m pytest tests/ -v --tb=short`
 
@@ -151,6 +154,42 @@ Output: outputs/620ee82b-0c6d-4db9-a7c6-931f0eac4615/
 **Files:** `src/smart_resume/ui/app.py`, `src/smart_resume/ui/__init__.py`, `pyproject.toml`
 **Implemented:** File upload (CV + JD), execution status/progress, score dashboard, generated markdown preview, and DOCX/audit JSON downloads.
 **Validation:** Streamlit launch confirmed with HTTP 200 on `http://localhost:8501`.
+
+---
+
+### 6.7 — Backend Task 1: Self-Hosted JWT Auth [Priority: HIGH] ✅ COMPLETED (2026-03-26)
+
+**Files:**
+- `src/smart_resume/api/auth.py`
+- `src/smart_resume/api/auth_routes.py`
+- `src/smart_resume/db/base.py`
+- `src/smart_resume/db/engine.py`
+- `src/smart_resume/db/models.py` (`UserRecord`)
+- `src/smart_resume/db/migrations/versions/20260326_0001_create_users_table.py`
+
+**Implemented:**
+- Local users table with hashed passwords
+- Register/login endpoints issuing JWT bearer tokens
+- Protected pipeline routes with `AUTH_ENABLED` toggle preserving local no-auth flow
+
+**Validation:** `tests/unit/test_auth.py` + `tests/unit/test_auth_routes.py` passing; full suite at 53/53.
+
+---
+
+### 6.8 — Backend Task 2: Pipeline Run DB Persistence [Priority: HIGH] ✅ COMPLETED (2026-03-26)
+
+**Files:**
+- `src/smart_resume/db/models.py` (`PipelineRunRecord`)
+- `src/smart_resume/db/repository.py`
+- `src/smart_resume/api/routes.py`
+- `src/smart_resume/db/migrations/versions/20260326_0002_create_pipeline_runs_table.py`
+
+**Implemented:**
+- Removed in-memory `_runs` store
+- Added async repository CRUD for run save/get/list
+- Persisted analyze/upload runs to DB and scoped list/download to `user_id`
+
+**Validation:** `tests/unit/test_repository.py` passing; full suite at 53/53.
 
 ---
 

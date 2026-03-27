@@ -22,6 +22,16 @@ class Settings(BaseSettings):
     max_reeval_iterations: int = 3
     target_score: int = 90
 
+    # ─── Auth ───
+    auth_enabled: bool = False
+    jwt_secret_key: str = "change-me-in-production"
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 1440
+
+    # ─── Database ───
+    database_url: str = "postgresql+asyncpg://smartuser:smartpass@localhost:5432/smart_resume"
+    db_echo: bool = False
+
     model_config = {
         "env_file": ".env",
         "env_file_encoding": "utf-8",
