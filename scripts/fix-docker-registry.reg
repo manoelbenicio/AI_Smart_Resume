@@ -1,0 +1,7 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Docker Inc.\Docker Desktop]
+"AppPath"="C:\\Program Files\\Docker\\Docker"
+"InstallPath"="C:\\Program Files\\Docker\\Docker"
+"BinPath"="C:\\Program Files\\Docker\\Docker\\resources\\bin"
+"Version"="4.39.0"

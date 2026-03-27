@@ -5,6 +5,12 @@
 > **Target Agent:** Codex
 > **Project Root:** `d:\VMs\Projetos\Smart_AI_Resume`
 
+> [!IMPORTANT]
+> **STATUS: ALL TASKS COMPLETED (v0.4.0)**
+> Both Task 1 (JWT Auth) and Task 2 (DB Persistence) were completed by Codex.
+> Current test baseline: **53/53 passing**. This document is now a **historical reference**.
+> See `docs/AGENTS_LOG.md` entries 036–049 for the implementation record.
+
 ---
 
 ## MANDATORY FIRST STEPS

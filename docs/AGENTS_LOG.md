@@ -182,3 +182,12 @@ Timestamped record of all agent development tasks.
 - **Files Modified:** `docs/AGENTS_LOG.md`, `docs/DELIVERABLES.md`, `CHANGELOG.md`, `docs/HANDOVER.md`, `README.md`, `project_status_report.md`
 - **Tests:** PASSED (53/53)
 - **Status:** COMPLETED
+
+### 050 — Full docs audit: ARCHITECTURE.md rewrite + CODEX_BACKEND_HANDOVER.md completion banner
+- **Agent:** Antigravity
+- **Timestamp:** 2026-03-27T05:10:00-03:00
+- **Phase:** Documentation
+- **Action:** Audited all 9 docs files + README + CHANGELOG. Rewrote `ARCHITECTURE.md` from v0.1.0 → v0.4.0 (added system diagram, auth layer, DB schema, API surface, updated design decisions, file tree). Added completion banner to `CODEX_BACKEND_HANDOVER.md`. Fixed deliverable count (40→41) in project status report.
+- **Files Modified:** `docs/ARCHITECTURE.md`, `docs/CODEX_BACKEND_HANDOVER.md`, `docs/AGENTS_LOG.md`, `docs/DELIVERABLES.md`, `project_status_report.md`
+- **Tests:** PASSED (53/53)
+- **Status:** COMPLETED

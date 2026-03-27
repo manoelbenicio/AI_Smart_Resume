@@ -9,7 +9,10 @@ class AnalyzeRequest(BaseModel):
     """Request body for the analyze endpoint (text-based input)."""
 
     cv_text: str = Field(..., description="Raw CV text")
-    jd_text: str = Field(..., description="Raw JD text or URL")
+    jd_text: str = Field("", description="Raw JD text (optional)")
+    job_url: str = Field("", description="URL of target job posting (optional)")
+    job_title: str = Field("", description="Target job title (optional)")
+    strict_mode: bool = Field(False, description="Apply stricter scoring")
 
 
 class AnalyzeResponse(BaseModel):

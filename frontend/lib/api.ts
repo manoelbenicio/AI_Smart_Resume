@@ -25,12 +25,16 @@ export async function analyzeText(payload: AnalyzeRequest): Promise<AnalyzeRespo
 /**
  * Submits a file (PDF/DOCX) and optional JD text for analysis.
  */
-export async function analyzeUpload(file: File, jdText?: string): Promise<AnalyzeResponse> {
+export async function analyzeUpload(
+    file: File,
+    opts?: { jd_text?: string; job_url?: string; job_title?: string; strict_mode?: boolean }
+): Promise<AnalyzeResponse> {
     const formData = new FormData();
-    formData.append("file", file);
-    if (jdText) {
-        formData.append("jd_text", jdText);
-    }
+    formData.append("cv_file", file);
+    formData.append("jd_text", opts?.jd_text || "");
+    if (opts?.job_url) formData.append("job_url", opts.job_url);
+    if (opts?.job_title) formData.append("job_title", opts.job_title);
+    if (opts?.strict_mode) formData.append("strict_mode", "true");
 
     const res = await fetch(`${API_BASE_URL}/api/v1/analyze/upload`, {
         method: "POST",

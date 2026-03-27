@@ -6,6 +6,7 @@ export interface AnalyzeRequest {
     cv_text: string;
     jd_text?: string;
     job_title?: string;
+    job_url?: string;
     focus_areas?: string[];
     strict_mode?: boolean;
 }

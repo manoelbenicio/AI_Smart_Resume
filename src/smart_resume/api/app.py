@@ -9,6 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from smart_resume.api.auth_routes import router as auth_router
 from smart_resume.api.routes import router
+from smart_resume.db.base import Base
+from smart_resume.db.engine import engine
 
 logging.basicConfig(
     level=logging.INFO,
@@ -38,6 +40,13 @@ app.add_middleware(
 
 app.include_router(router)
 app.include_router(auth_router)
+
+
+@app.on_event("startup")
+async def init_database() -> None:
+    """Create DB tables if they do not exist yet."""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 
 @app.get("/health")

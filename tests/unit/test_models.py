@@ -138,3 +138,14 @@ class TestRiskModels:
         )
         assert not result.is_commodity
         assert len(result.differentiators) == 3
+
+    def test_distinctiveness_coerces_string_commodity_flags(self) -> None:
+        result = DistinctivenessResult.model_validate(
+            {
+                "differentiators": ["Global transformation experience"],
+                "is_commodity": "irreplaceable",
+                "commodity_rationale": "Rare mix of scale and strategy",
+                "weaknesses": [],
+            }
+        )
+        assert result.is_commodity is False

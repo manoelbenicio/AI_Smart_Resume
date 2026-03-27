@@ -28,8 +28,15 @@ async def analyze_text(
     db: AsyncSession = Depends(get_db),
 ) -> AnalyzeResponse:
     """Run the full 8-phase pipeline with text inputs."""
+    effective_jd = request.jd_text
+    if request.job_url:
+        url_context = f"[Target Job URL: {request.job_url}]"
+        effective_jd = f"{url_context}\n\n{request.jd_text}" if request.jd_text else url_context
+    if request.job_title and not effective_jd:
+        effective_jd = f"Target role: {request.job_title}"
+
     orchestrator = Orchestrator()
-    state = await run_in_threadpool(orchestrator.run, request.cv_text, request.jd_text)
+    state = await run_in_threadpool(orchestrator.run, request.cv_text, effective_jd)
     await save_run(db, user.user_id, state)
     return _build_response(state)
 
@@ -37,11 +44,22 @@ async def analyze_text(
 @router.post("/analyze/upload", response_model=AnalyzeResponse)
 async def analyze_upload(
     cv_file: UploadFile = File(..., description="CV file (docx/pdf/txt)"),
-    jd_text: str = Form(..., description="Job description text or URL"),
+    jd_text: str = Form("", description="Job description text"),
+    job_url: str = Form("", description="URL of target job posting"),
+    job_title: str = Form("", description="Target job title"),
+    strict_mode: bool = Form(False, description="Apply stricter scoring"),
     user: UserContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> AnalyzeResponse:
     """Run the full pipeline with a file upload for the CV."""
+    # Combine JD text with job URL context if both provided
+    effective_jd = jd_text
+    if job_url:
+        url_context = f"[Target Job URL: {job_url}]"
+        effective_jd = f"{url_context}\n\n{jd_text}" if jd_text else url_context
+    if job_title and not effective_jd:
+        effective_jd = f"Target role: {job_title}"
+
     # Save uploaded file temporarily
     suffix = Path(cv_file.filename or "cv.txt").suffix
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
@@ -51,7 +69,7 @@ async def analyze_upload(
 
     try:
         orchestrator = Orchestrator()
-        state = await run_in_threadpool(orchestrator.run, tmp_path, jd_text)
+        state = await run_in_threadpool(orchestrator.run, tmp_path, effective_jd)
         await save_run(db, user.user_id, state)
         return _build_response(state)
     finally:

@@ -21,6 +21,10 @@ env/
 # ─── Environment ───
 .env
 .env.local
+fix_docker_wsl.ps1
+fix_ubuntu_final.ps1
+fix_ubuntu_wsl.ps1
+tmp_cv_test.txt
 
 # ─── Project Runtime ───
 outputs/

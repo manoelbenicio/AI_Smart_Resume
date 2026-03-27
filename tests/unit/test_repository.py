@@ -107,3 +107,23 @@ async def test_save_run_updates_existing_record(session: AsyncSession) -> None:
     assert stored is not None
     assert stored.final_score == 95.0
     assert stored.iterations_used == 3
+
+
+@pytest.mark.asyncio
+async def test_save_run_strips_nul_characters_from_payload(session: AsyncSession) -> None:
+    await _create_user(session, "user-1", "user1@test.com")
+    state = _build_pipeline_run("run-null", final_score=81.0)
+    state.improved_cv_markdown = "Header\x00Body"
+
+    record = await save_run(session, "user-1", state)
+
+    def contains_nul(value: object) -> bool:
+        if isinstance(value, str):
+            return "\x00" in value
+        if isinstance(value, list):
+            return any(contains_nul(item) for item in value)
+        if isinstance(value, dict):
+            return any(contains_nul(item) for item in value.values())
+        return False
+
+    assert not contains_nul(record.data)

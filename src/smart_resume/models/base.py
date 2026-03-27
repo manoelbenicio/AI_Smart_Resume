@@ -64,5 +64,7 @@ class LLMSafeModel(BaseModel):
             annotation = hints.get(field_name)
             if annotation and _is_list_type(annotation):
                 values[field_name] = []
+            elif annotation is str:
+                values[field_name] = ""
 
         return values

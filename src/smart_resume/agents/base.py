@@ -57,40 +57,25 @@ class BaseAgent(ABC):
 
         Handles responses wrapped in ```json ... ``` fences.
         """
-        # Strip markdown fences
         cleaned = re.sub(r"```(?:json)?\s*", "", raw)
         cleaned = cleaned.strip().rstrip("`")
 
-        # Find first { or [
-        start = -1
+        decoder = json.JSONDecoder()
         for i, ch in enumerate(cleaned):
-            if ch in ("{", "["):
-                start = i
-                break
-        if start == -1:
-            raise ValueError(f"[{self.agent_name}] No JSON found in LLM response")
+            if ch not in ("{", "["):
+                continue
+            snippet = cleaned[i:]
+            try:
+                parsed, _ = decoder.raw_decode(snippet)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(parsed, dict):
+                return parsed
+            if isinstance(parsed, list):
+                return {"items": parsed}
 
-        # Find matching closing brace/bracket
-        open_char = cleaned[start]
-        close_char = "}" if open_char == "{" else "]"
-        depth = 0
-        end = start
-        for i in range(start, len(cleaned)):
-            if cleaned[i] == open_char:
-                depth += 1
-            elif cleaned[i] == close_char:
-                depth -= 1
-                if depth == 0:
-                    end = i
-                    break
-
-        json_str = cleaned[start : end + 1]
-        try:
-            return json.loads(json_str)  # type: ignore[no-any-return]
-        except json.JSONDecodeError as exc:
-            raise ValueError(
-                f"[{self.agent_name}] Failed to parse JSON: {exc}\nExtracted: {json_str[:500]}"
-            ) from exc
+        preview = cleaned[:500]
+        raise ValueError(f"[{self.agent_name}] Failed to parse JSON from response. Preview: {preview}")
 
     # ─── Abstract interface ──────────────────────────────────────
 

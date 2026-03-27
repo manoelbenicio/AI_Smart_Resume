@@ -9,3 +9,21 @@ __pycache__
 .ruff_cache
 .git
 docs
+
+# Frontend (not needed in API container)
+frontend/node_modules
+frontend/.next
+frontend/.cache
+
+# IDE
+.vscode
+.idea
+*.swp
+
+# Scripts
+*.bat
+*.ps1
+
+# Misc
+*.log
+.env.local

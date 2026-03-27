@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Loader2, FileText, Upload, AlertCircle } from "lucide-react";
+import { Loader2, FileText, Upload, AlertCircle, Link } from "lucide-react";
 import { DropZone } from "@/components/DropZone";
 import { analyzeText, analyzeUpload } from "@/lib/api";
 
@@ -20,6 +20,7 @@ export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [cvText, setCvText] = useState("");
 
+  const [jobUrl, setJobUrl] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [jdText, setJdText] = useState("");
   const [strictMode, setStrictMode] = useState(false);
@@ -35,12 +36,18 @@ export default function Home() {
       let res;
       if (activeTab === "upload") {
         if (!file) throw new Error("Please select a file first.");
-        res = await analyzeUpload(file, jdText || undefined);
+        res = await analyzeUpload(file, {
+          jd_text: jdText || undefined,
+          job_url: jobUrl || undefined,
+          job_title: jobTitle || undefined,
+          strict_mode: strictMode,
+        });
       } else {
         if (!cvText.trim()) throw new Error("Please paste your CV text.");
         res = await analyzeText({
           cv_text: cvText,
           jd_text: jdText || undefined,
+          job_url: jobUrl || undefined,
           job_title: jobTitle || undefined,
           strict_mode: strictMode,
         });
@@ -110,7 +117,26 @@ export default function Home() {
             </Tabs>
           </CardHeader>
 
-          <CardContent className="pb-6">
+          <CardContent className="pb-6 space-y-4">
+            {/* Job URL — visible by default */}
+            <div className="grid gap-2">
+              <Label htmlFor="job-url" className="text-sm font-medium flex items-center gap-1.5">
+                <Link className="w-3.5 h-3.5" />
+                Job Posting URL
+              </Label>
+              <input
+                id="job-url"
+                type="url"
+                placeholder="https://linkedin.com/jobs/view/... or any job posting link"
+                className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                value={jobUrl}
+                onChange={(e) => setJobUrl(e.target.value)}
+              />
+              <p className="text-[11px] text-muted-foreground leading-tight">
+                Paste the job posting URL — the system will extract requirements and score your CV against them.
+              </p>
+            </div>
+
             <Accordion className="w-full">
               <AccordionItem value="settings" className="border-muted/50 border rounded-lg px-4 bg-background/30 backdrop-blur-sm">
                 <AccordionTrigger className="hover:no-underline py-3 text-sm font-medium">

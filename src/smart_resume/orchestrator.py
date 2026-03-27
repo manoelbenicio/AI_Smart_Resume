@@ -167,24 +167,31 @@ class Orchestrator:
     def _resolve_cv(cv_input: str) -> str:
         """Resolve CV input to raw text."""
         path = Path(cv_input)
-        if path.exists():
+        if path.exists() and path.is_file():
             suffix = path.suffix.lower()
-            if suffix == ".docx":
-                return parse_docx(path)
-            if suffix == ".pdf":
-                return parse_pdf(path)
-            return path.read_text(encoding="utf-8")
+            try:
+                if suffix == ".docx":
+                    return parse_docx(path)
+                if suffix == ".pdf":
+                    return parse_pdf(path)
+                return path.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                logger.warning("Failed to parse CV as %s; falling back to raw text decode", suffix or "file")
+                return path.read_bytes().decode("utf-8", errors="ignore")
         # Treat as raw text
         return cv_input
 
     @staticmethod
     def _resolve_jd(jd_input: str) -> str:
         """Resolve JD input to raw text (file, URL, or raw text)."""
+        if not jd_input or not jd_input.strip():
+            return ""
+
         if jd_input.startswith(("http://", "https://")):
             from smart_resume.parsers.url_parser import parse_url
 
             return parse_url(jd_input)
         path = Path(jd_input)
-        if path.exists():
+        if path.exists() and path.is_file():
             return path.read_text(encoding="utf-8")
         return jd_input

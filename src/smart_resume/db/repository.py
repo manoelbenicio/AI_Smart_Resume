@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,6 +17,17 @@ def _parse_iso_datetime(value: str | None) -> datetime | None:
     if value is None:
         return None
     return datetime.fromisoformat(value)
+
+
+def _strip_nul_chars(value: Any) -> Any:
+    """Recursively remove NUL characters from JSON-compatible payloads."""
+    if isinstance(value, str):
+        return value.replace("\x00", "")
+    if isinstance(value, list):
+        return [_strip_nul_chars(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _strip_nul_chars(item) for key, item in value.items()}
+    return value
 
 
 async def _ensure_user_for_run(session: AsyncSession, user_id: str) -> None:
@@ -42,7 +54,7 @@ async def _ensure_user_for_run(session: AsyncSession, user_id: str) -> None:
 async def save_run(session: AsyncSession, user_id: str, pipeline_run: PipelineRun) -> PipelineRunRecord:
     """Persist a pipeline run payload and summary metadata."""
     await _ensure_user_for_run(session, user_id)
-    payload = pipeline_run.model_dump(mode="json")
+    payload = _strip_nul_chars(pipeline_run.model_dump(mode="json"))
 
     record = await session.get(PipelineRunRecord, pipeline_run.run_id)
     if record is None:

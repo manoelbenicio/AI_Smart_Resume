@@ -46,3 +46,4 @@ Maps every requirement from `project_scope.md` to implementation status.
 | 40 | Pipeline run DB persistence (replace in-memory runs) | Backend Handover Task 2 | `src/smart_resume/db/repository.py`, `src/smart_resume/api/routes.py`, `src/smart_resume/db/migrations/versions/20260326_0002_create_pipeline_runs_table.py`, `tests/unit/test_repository.py` | ✅ Done |
 | 41 | Git push v0.4.0 to GitHub (`main` branch) | Deployment | `https://github.com/manoelbenicio/AI_Smart_Resume.git` — 168 objects, all code + docs | ✅ Done |
 | 42 | Full project management docs sync (all docs current) | Project Governance | `AGENTS_LOG.md`, `DELIVERABLES.md`, `CHANGELOG.md`, `HANDOVER.md`, `README.md` | ✅ Done |
+| 43 | ARCHITECTURE.md v0.4.0 rewrite + CODEX_BACKEND_HANDOVER completion banner | Documentation Audit | `docs/ARCHITECTURE.md`, `docs/CODEX_BACKEND_HANDOVER.md` | ✅ Done |
