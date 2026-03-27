@@ -164,3 +164,21 @@ Timestamped record of all agent development tasks.
 - **Files Modified:** `src/smart_resume/db/models.py`, `src/smart_resume/db/repository.py`, `src/smart_resume/api/routes.py`, `src/smart_resume/db/migrations/versions/20260326_0002_create_pipeline_runs_table.py`, `tests/unit/test_repository.py`
 - **Tests:** PASSED (53/53)
 - **Status:** COMPLETED
+
+### 048 — Push v0.4.0 to GitHub
+- **Agent:** Antigravity
+- **Timestamp:** 2026-03-27T00:44:00-03:00
+- **Phase:** Deployment
+- **Action:** Committed all project code (168 objects) and pushed to `https://github.com/manoelbenicio/AI_Smart_Resume.git` on branch `main`. Fixed embedded `.git` in `frontend/` before staging. Authenticated via browser-based GitHub credential manager.
+- **Files Modified:** All project files (initial push to remote)
+- **Tests:** PASSED (53/53)
+- **Status:** COMPLETED
+
+### 049 — Full project management docs sync
+- **Agent:** Antigravity
+- **Timestamp:** 2026-03-27T00:56:00-03:00
+- **Phase:** Documentation
+- **Action:** Updated all project management documents to reflect v0.4.0 final state: AGENTS_LOG, DELIVERABLES, CHANGELOG, HANDOVER, README, and project status report. All pending items marked COMPLETED. Architecture tree and test counts synced across all docs.
+- **Files Modified:** `docs/AGENTS_LOG.md`, `docs/DELIVERABLES.md`, `CHANGELOG.md`, `docs/HANDOVER.md`, `README.md`, `project_status_report.md`
+- **Tests:** PASSED (53/53)
+- **Status:** COMPLETED

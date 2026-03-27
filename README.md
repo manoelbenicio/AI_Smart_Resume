@@ -2,6 +2,8 @@
 
 **Smart AI Resume** — A multi-agent Python system that evaluates executive CVs against target job descriptions, scores market positioning across 8 dimensions, benchmarks against executive archetypes, and generates repositioned, ATS-friendly CVs.
 
+**Version:** 0.4.0 | **Tests:** 53/53 | **GitHub:** [manoelbenicio/AI_Smart_Resume](https://github.com/manoelbenicio/AI_Smart_Resume)
+
 ---
 
 ## Architecture
@@ -37,13 +39,14 @@ JD (Text/URL)     ──┘          │                     │                
 ## Quick Start
 
 ### Prerequisites
-- Python 3.11+
+- Python 3.11+ and Docker Desktop
 - An [OpenAI API key](https://platform.openai.com/api-keys) (GPT-4o)
 
 ### 1. Clone & Install
 
 ```bash
-cd d:\VMs\Projetos\Smart_AI_Resume
+git clone https://github.com/manoelbenicio/AI_Smart_Resume.git
+cd AI_Smart_Resume
 
 # Create virtual environment
 python -m venv .venv
@@ -62,19 +65,38 @@ pip install -e ".[dev]"
 copy .env.example .env
 # Edit .env and add your OpenAI API key:
 #   OPENAI_API_KEY=sk-...
+#   JWT_SECRET_KEY=your-secret-here
+#   DATABASE_URL=postgresql+asyncpg://smartresume:smartresume@localhost:5432/smartresume
 ```
 
-### 3. Run via CLI
+### 3. Start Database
+
+```bash
+docker compose up -d postgres
+# Run migrations
+alembic upgrade head
+```
+
+### 4. Run via CLI
 
 ```bash
 smart-resume analyze --cv tests/fixtures/sample_cv.txt --jd tests/fixtures/sample_jd.txt
 ```
 
-### 4. Run via API
+### 5. Run via API
 
 ```bash
 uvicorn smart_resume.api.app:app --reload --port 8000
 # then open http://localhost:8000/docs for Swagger UI
+```
+
+### 6. Run Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+# open http://localhost:3000
 ```
 
 ---
@@ -85,31 +107,34 @@ uvicorn smart_resume.api.app:app --reload --port 8000
 Smart_AI_Resume/
 ├── src/smart_resume/
 │   ├── agents/           # 7 specialized LLM agents
-│   │   ├── base.py           BaseAgent (provider-agnostic LLM abstraction)
-│   │   ├── extraction.py     Phase 1 — CV + JD parsing
-│   │   ├── scoring.py        Phase 2 — 8-category market positioning
-│   │   ├── benchmark.py      Phase 3 — Executive archetype comparison
-│   │   ├── distinctiveness.py Phase 4 — Differentiators
-│   │   ├── risk_assessment.py Phase 5 — Risk classification
-│   │   ├── cv_generator.py   Phase 6 — CV rewrite
-│   │   └── re_evaluation.py  Phase 7 — Score & iterate
-│   ├── models/           # Pydantic v2 data models
+│   ├── models/           # Pydantic v2 data models (LLMSafeModel)
 │   ├── parsers/          # DOCX / PDF / URL ingestion
 │   ├── exporters/        # DOCX / PDF output generation
-│   ├── api/              # FastAPI REST API
+│   ├── api/              # FastAPI REST API + JWT auth
+│   │   ├── auth.py           JWT helpers + get_current_user
+│   │   ├── auth_routes.py    POST /auth/register, /auth/login
+│   │   ├── routes.py         Pipeline endpoints (protected)
+│   │   └── schemas.py        Request/response models
+│   ├── db/               # Async SQLAlchemy persistence
+│   │   ├── engine.py         Async engine + sessions
+│   │   ├── models.py         UserRecord, PipelineRunRecord
+│   │   ├── repository.py     save_run, get_run, list_runs
+│   │   └── migrations/       Alembic (users + pipeline_runs)
 │   ├── orchestrator.py   # 8-phase pipeline sequencer
 │   ├── cli.py            # Typer CLI entry point
 │   └── config.py         # Settings via pydantic-settings
+├── frontend/             # Premium Next.js 15 dashboard
+│   ├── app/              # App Router pages
+│   ├── components/       # ScoreHero, RadarChart, BenchmarkBars, RiskHeatmap
+│   └── lib/              # API client, types
 ├── tests/
 │   ├── fixtures/         # Sample CV + JD for testing
-│   ├── unit/             # Model, parser, config tests
+│   ├── unit/             # Model, parser, config, auth, repository tests
 │   └── integration/      # Full pipeline tests
-├── docs/
-│   ├── AGENTS_LOG.md     # Timestamped execution audit log
-│   ├── DELIVERABLES.md   # Feature contract tracking
-│   └── ARCHITECTURE.md   # System design documentation
+├── docs/                 # Project management docs
 ├── outputs/              # Runtime outputs (gitignored)
 ├── CHANGELOG.md          # Version history
+├── docker-compose.yml    # API + PostgreSQL services
 └── pyproject.toml        # Python project config
 ```
 
@@ -118,7 +143,7 @@ Smart_AI_Resume/
 ## Testing
 
 ```bash
-# Run all tests
+# Run all tests (53 tests)
 python -m pytest tests/ -v --tb=short
 
 # With coverage
@@ -143,16 +168,38 @@ python -m pytest tests/integration/ -v
 | `MAX_REEVAL_ITERATIONS` | `3` | Max retry loops |
 | `OUTPUT_DIR` | `outputs` | Directory for results |
 | `LOG_LEVEL` | `INFO` | Logging level |
+| `AUTH_ENABLED` | `true` | JWT authentication toggle |
+| `JWT_SECRET_KEY` | *(required)* | Secret for JWT signing |
+| `DATABASE_URL` | `postgresql+asyncpg://...` | Async database URL |
 
 ---
 
 ## API Endpoints
 
-| Method | Path | Description |
-|---|---|---|
-| `POST` | `/api/v1/analyze` | Upload CV + JD, run full pipeline |
-| `GET` | `/api/v1/runs/{run_id}` | Retrieve past run results |
-| `GET` | `/api/v1/runs/{run_id}/download` | Download final DOCX |
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/v1/auth/register` | No | Register new user |
+| `POST` | `/api/v1/auth/login` | No | Login, receive JWT |
+| `POST` | `/api/v1/analyze` | JWT | Upload CV + JD, run full pipeline |
+| `POST` | `/api/v1/analyze/upload` | JWT | File upload variant |
+| `GET` | `/api/v1/runs` | JWT | List user's pipeline runs |
+| `GET` | `/api/v1/runs/{run_id}/download` | JWT | Download final DOCX |
+| `GET` | `/health` | No | Health check |
+
+---
+
+## Docker
+
+```bash
+# Start everything (API + PostgreSQL)
+docker compose up -d
+
+# Just the database
+docker compose up -d postgres
+
+# Rebuild API container
+docker compose up -d --build smart-resume-api
+```
 
 ---
 

@@ -39,10 +39,27 @@ src/smart_resume/
 │   └── re_evaluation.py
 ├── parsers/         # Input file handling (docx, pdf, url)
 ├── exporters/       # Output (docx, pdf)
-├── api/             # FastAPI REST interface
+├── api/             # FastAPI REST interface + JWT auth
+│   ├── app.py       # FastAPI app factory
+│   ├── routes.py    # Pipeline endpoints (protected)
+│   ├── auth.py      # JWT token creation + get_current_user
+│   ├── auth_routes.py  # POST /auth/register, /auth/login
+│   └── schemas.py   # Request/response models
+├── db/              # Async SQLAlchemy persistence
+│   ├── base.py      # DeclarativeBase
+│   ├── engine.py    # Async engine + session factory
+│   ├── models.py    # UserRecord, PipelineRunRecord
+│   ├── repository.py  # save_run, get_run, list_runs
+│   └── migrations/  # Alembic (users + pipeline_runs)
 ├── cli.py           # Typer CLI entry point
 ├── orchestrator.py  # 8-phase pipeline sequencer
 └── config.py        # Pydantic Settings (.env)
+
+frontend/            # Premium Next.js 15 dashboard
+├── app/             # App Router pages
+├── components/      # ScoreHero, RadarChart, BenchmarkBars, RiskHeatmap
+├── lib/             # API client, types
+└── tailwind.config.ts
 ```
 
 **Full architecture:** See `docs/ARCHITECTURE.md`
@@ -60,6 +77,9 @@ src/smart_resume/
 | `LLM_TEMPERATURE` | LLM sampling temperature | `0.4` |
 | `LLM_MAX_TOKENS` | Max response tokens | `4096` |
 | `OUTPUT_DIR` | Audit trail output | `outputs` |
+| `AUTH_ENABLED` | Enable JWT auth (disable for dev) | `true` |
+| `JWT_SECRET_KEY` | Secret for signing JWT tokens | (required if auth enabled) |
+| `DATABASE_URL` | PostgreSQL async connection | `postgresql+asyncpg://...` |
 
 **Virtual environment:** `.venv\` (Python 3.12+, managed via `pip`/`uv`)
 **Install:** `pip install -e ".[dev]"` from project root
@@ -149,11 +169,10 @@ Output: outputs/620ee82b-0c6d-4db9-a7c6-931f0eac4615/
 
 ---
 
-### 6.6 — Streamlit Web UI [Priority: LOW — Stretch Goal] ✅ COMPLETED (2026-03-26)
+### 6.6 — ~~Streamlit Web UI~~ SUPERSEDED by Premium Next.js Frontend ✅ COMPLETED (2026-03-26)
 
-**Files:** `src/smart_resume/ui/app.py`, `src/smart_resume/ui/__init__.py`, `pyproject.toml`
-**Implemented:** File upload (CV + JD), execution status/progress, score dashboard, generated markdown preview, and DOCX/audit JSON downloads.
-**Validation:** Streamlit launch confirmed with HTTP 200 on `http://localhost:8501`.
+**Status:** Streamlit was built, tested, then **removed** per user directive (too basic for Fortune 500 caliber). Replaced by Next.js 15 + Tailwind + Recharts/D3 premium dashboard in `frontend/`.
+**Validation:** `npm run build` exits 0 under strict ESLint + TypeScript.
 
 ---
 
@@ -242,9 +261,24 @@ cd d:\VMs\Projetos\Smart_AI_Resume
 |------|------|---------------|
 | `src/smart_resume/models/base.py` | LLMSafeModel base class | 2026-03-26 |
 | `src/smart_resume/orchestrator.py` | 8-phase pipeline | 2026-03-26 |
-| `src/smart_resume/cli.py` | CLI entry point (bug in scores display) | 2026-03-26 |
+| `src/smart_resume/cli.py` | CLI entry point (scores display fixed) | 2026-03-26 |
 | `src/smart_resume/agents/scoring.py` | Market positioning scoring | 2026-03-26 |
-| `src/smart_resume/agents/cv_generator.py` | CV rewriting agent | 2026-03-26 |
+| `src/smart_resume/agents/cv_generator.py` | CV rewriting agent (tuned to 95+) | 2026-03-26 |
+| `src/smart_resume/api/auth.py` | JWT auth + get_current_user | 2026-03-26 |
+| `src/smart_resume/api/auth_routes.py` | Register/login endpoints | 2026-03-26 |
+| `src/smart_resume/db/repository.py` | Async DB CRUD for pipeline runs | 2026-03-26 |
+| `frontend/app/page.tsx` | Next.js landing page | 2026-03-27 |
+| `frontend/app/dashboard/[id]/page.tsx` | Dashboard with charts | 2026-03-27 |
+| `docker-compose.yml` | API + PostgreSQL services | 2026-03-27 |
 | `tests/fixtures/sample_cv.txt` | Test CV fixture | 2026-03-26 |
 | `tests/fixtures/sample_jd.txt` | Test JD fixture | 2026-03-26 |
 | `project_scope.md` | Full project specification | 2026-03-26 |
+
+---
+
+## 11. GitHub Repository
+
+- **URL:** https://github.com/manoelbenicio/AI_Smart_Resume
+- **Branch:** `main`
+- **Last pushed:** 2026-03-27T00:44:00-03:00 (v0.4.0, 168 objects)
+
