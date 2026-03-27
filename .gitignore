@@ -1,0 +1,38 @@
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# ─── Virtual Environments ───
+.venv/
+venv/
+env/
+
+# ─── IDE ───
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── Environment ───
+.env
+.env.local
+
+# ─── Project Runtime ───
+outputs/
+!outputs/.gitkeep
+
+# ─── Testing ───
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# ─── OS ───
+.DS_Store
+Thumbs.db
+desktop.ini

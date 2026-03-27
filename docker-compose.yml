@@ -1,0 +1,24 @@
+services:
+  smart-resume-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: smart-ai-resume:latest
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./outputs:/app/outputs
+    command: ["python", "-m", "uvicorn", "smart_resume.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  smart-resume-cli:
+    image: smart-ai-resume:latest
+    profiles: ["cli"]
+    env_file:
+      - .env
+    volumes:
+      - ./outputs:/app/outputs
+    depends_on:
+      - smart-resume-api
+    command: ["python", "-m", "smart_resume.cli", "--cv", "tests/fixtures/sample_cv.txt", "--jd", "tests/fixtures/sample_jd.txt"]

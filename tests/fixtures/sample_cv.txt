@@ -1,0 +1,49 @@
+John A. Executive
+Email: john.executive@email.com | Phone: +1 (555) 123-4567
+
+PROFESSIONAL SUMMARY
+Seasoned technology executive with 15+ years of experience driving digital transformation at Fortune 500 companies. Led cross-functional teams of up to 500 people across 12 countries, delivering $200M+ in cumulative cost savings through cloud migration, AI adoption, and process automation initiatives.
+
+PROFESSIONAL EXPERIENCE
+
+Chief Technology Officer | GlobalTech Industries | New York, NY | 2019 – Present
+- Led enterprise-wide digital transformation across 3 continents, impacting 8,000+ employees
+- Reduced infrastructure costs by $45M annually through cloud-first strategy (AWS/Azure)
+- Built and scaled AI/ML division from 5 to 120 data scientists and engineers
+- Drove M&A technology due diligence for 4 acquisitions totaling $1.2B
+- Established cybersecurity framework that reduced incidents by 78%
+
+VP of Engineering | DataDrive Corp | San Francisco, CA | 2015 – 2019
+- Managed 200+ engineers across US, India, and UK offices
+- Delivered real-time analytics platform processing 10B events/day
+- Achieved 99.99% uptime SLA for mission-critical payment systems
+- Reduced time-to-market by 40% through DevOps and CI/CD adoption
+
+Senior Director, Technology | InnovateCo | London, UK | 2011 – 2015
+- Spearheaded migration of legacy systems to microservices architecture
+- Managed $30M annual technology budget across EMEA region
+- Led SOX compliance and GDPR readiness initiatives
+
+Engineering Manager | TechStart Solutions | Toronto, Canada | 2008 – 2011
+- Built engineering team from 3 to 45 people
+- Launched SaaS platform serving 500+ enterprise clients
+
+EDUCATION
+MBA, Technology Management | MIT Sloan School of Management | 2012
+B.Sc., Computer Science | University of Toronto | 2007
+
+CERTIFICATIONS
+- AWS Solutions Architect Professional
+- Google Cloud Professional Cloud Architect
+- PMP (Project Management Professional)
+- TOGAF 9 Certified
+
+SKILLS
+Cloud Architecture, Digital Transformation, AI/ML Strategy, M&A Technology Integration, Cybersecurity, Agile/DevOps, Data Analytics, Board-Level Communication
+
+LANGUAGES
+English (Native), French (Professional), Mandarin (Conversational)
+
+AWARDS
+- CIO 100 Award, 2022
+- Digital Transformation Leader of the Year, 2021
