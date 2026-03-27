@@ -1,0 +1,123 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-hover: var(--accent-hover);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  /* Custom Status Colors */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Charts */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root, .dark {
+  /* Dark Mode Primary (From Handover) */
+  --background: hsl(220, 20%, 6%);
+  /* Surface */
+  --card: hsl(220, 18%, 10%);
+  --popover: hsl(220, 18%, 10%);
+  
+  /* Text */
+  --foreground: hsl(0, 0%, 95%);
+  --card-foreground: hsl(0, 0%, 95%);
+  --popover-foreground: hsl(0, 0%, 95%);
+  
+  --muted: hsl(220, 16%, 14%); /* Surface Hover */
+  --muted-foreground: hsl(0, 0%, 60%);
+  
+  /* Accent */
+  --primary: hsl(250, 80%, 65%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  
+  --secondary: hsl(220, 16%, 14%);
+  --secondary-foreground: hsl(0, 0%, 95%);
+  
+  --accent: hsl(250, 80%, 65%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --accent-hover: hsl(250, 80%, 72%);
+  
+  /* Status */
+  --destructive: hsl(0, 75%, 55%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  
+  --success: hsl(145, 70%, 50%);
+  --warning: hsl(35, 90%, 55%);
+  --info: hsl(200, 80%, 55%);
+  
+  /* Borders & Inputs */
+  --border: hsl(220, 14%, 18%);
+  --input: hsl(220, 14%, 18%);
+  
+  --ring: hsl(250, 80%, 65%);
+  
+  --radius: 0.75rem;
+
+  /* Charts */
+  --chart-1: hsl(250, 80%, 65%); /* Purple */
+  --chart-2: hsl(200, 80%, 55%); /* Blue */
+  --chart-3: hsl(145, 70%, 50%); /* Green */
+  --chart-4: hsl(35, 90%, 55%);  /* Amber */
+  --chart-5: hsl(0, 75%, 55%);   /* Red */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  /* Glassmorphism utility */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}
